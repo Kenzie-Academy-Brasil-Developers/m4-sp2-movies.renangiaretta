@@ -24,7 +24,7 @@ A tabela deve seguir as seguintes especificações:
 Esse serviço precisa possuir uma API REST para que os demais serviços consigam criar, listar, atualizar e deletar filmes de um banco de dados.
 
 * O banco de dados deve ser **PostgreSQL**.
-* O diagrama sobre a tabla de ver feito.
+* O diagrama sobre a tabela deve ser feito.
 
 ### **POST: /movies**
 
