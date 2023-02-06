@@ -4,7 +4,7 @@ import { client } from "./database"
 import { MoviesResult } from "./interface"
 
 const ensureMovieExists = async (request: Request, response: Response, next: NextFunction): Promise<Response | void> => {
-    const id: number = parseInt(request.params.id)
+    const id: number          = parseInt(request.params.id)
     const queryString: string = `
     SELECT
         *
@@ -14,17 +14,18 @@ const ensureMovieExists = async (request: Request, response: Response, next: Nex
         id = $1
     `
     const queryConfig: QueryConfig = {
-        text: queryString,
+        text  : queryString,
         values: [id]
     }
-    console.log('middlewqare ok')
+    console.log('entrou no middleware')
     const queryResult: MoviesResult = await client.query(queryConfig)
     if(!queryResult.rowCount){
+        console.log('não passou pelo middleware')
         return response.status(404).json({
             message: 'Movie not found!'
         })
     }else {
-        console.log('aaaaa')
+        console.log('passou pelo middleware')
         return next()
 
     }
