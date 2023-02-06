@@ -110,8 +110,8 @@ const deleteMovie = async (request: Request, response: Response): Promise<Respon
         })
         
     }
-
 }
+
 const updateMovie = async (request: Request, response: Response): Promise<Response> => {
     try {
         if(request.body.id){
