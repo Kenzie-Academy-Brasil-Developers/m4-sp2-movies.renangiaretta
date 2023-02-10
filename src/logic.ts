@@ -28,9 +28,8 @@ const createMovie = async ( request: Request, response: Response ):Promise<Respo
     } catch (error) {
         if(error instanceof Error){
             return response.status(409).json({
-                message: error.message
+                message: 'Movie already exists.'
             })
-            
         }
         return response.status(500).json({
             message: 'Internal server error.'
@@ -39,51 +38,57 @@ const createMovie = async ( request: Request, response: Response ):Promise<Respo
 }
 
 const listMovies = async (request: Request, response: Response):Promise<Response> => {
-    const per_page: number    = (request.query.per_page === undefined || Number(request.query.per_page) > 5) ? 5 : Number(request.query.per_page)
-    let   page: number        = (request.query.page     === undefined || Number(request.query.page) <= 0) ? 1 : Number(request.query.page)
-          page                = (per_page * page) - per_page
-    const queryString: string = `
-    SELECT
-        *
-    FROM
-        movies
-    LIMIT $1 OFFSET $2;   
-    `
-    const queryConfig: QueryConfig = {
-        text  : queryString,
-        values: [per_page, page]
-    }
-    const queryResult: MoviesResult = await client.query(queryConfig)
-    console.log(queryResult.rows)
-    return response.status(201).json(queryResult.rows)
-}
-
-const retrieveMovie = async ( request: Request, response: Response ): Promise<Response> => {
-        const id: number          = parseInt(request.params.id)
+    try {
+        const per_page: number    = (request.query.per_page === undefined || Number(request.query.per_page) > 5 || Number(request.query.per_page) <= 0 ) ? 5 : Number(request.query.per_page)
+        let   page: number        = (request.query.page     === undefined || Number(request.query.page || typeof(request.query.page) === "string") <= 0) ? 1 : Number(request.query.page)
+              page                = (per_page * page) - per_page
         const queryString: string = `
         SELECT
             *
         FROM
             movies
-        WHERE
-            id = $1
+        LIMIT $1 OFFSET $2;   
         `
         const queryConfig: QueryConfig = {
             text  : queryString,
-            values: [id]
+            values: [per_page, page]
         }
-        try {
-            const queryResult: MoviesResult = await client.query(queryConfig)
-            console.log(queryConfig)
-            return response.status(200).json(queryResult.rows[0])
-            
-        } catch (error) {
-            
-                    return response.status(500).json({
-                        message: 'Internal server error'
-                    })
-            
-        }
+        const queryResult: MoviesResult = await client.query(queryConfig)
+
+        return response.status(201).json(queryResult.rows)
+    } catch (error) {
+        return response.status(400).json({
+            message: `BAD REQUEST`
+        })
+    }
+}
+
+const retrieveMovie = async ( request: Request, response: Response ): Promise<Response> => {
+    const id: number          = parseInt(request.params.id)
+    const queryString: string = `
+    SELECT
+        *
+    FROM
+        movies
+    WHERE
+        id = $1
+    `
+    const queryConfig: QueryConfig = {
+        text  : queryString,
+        values: [id]
+    }
+    try {
+        const queryResult: MoviesResult = await client.query(queryConfig)
+        console.log(queryConfig)
+        return response.status(200).json(queryResult.rows[0])
+        
+    } catch (error) {
+        
+                return response.status(500).json({
+                    message: 'Internal server error'
+                })
+        
+    }
 }
 
 const deleteMovie = async (request: Request, response: Response): Promise<Response> => {
@@ -108,7 +113,6 @@ const deleteMovie = async (request: Request, response: Response): Promise<Respon
         return response.status(500).json({
             message: 'Internal server error'
         })
-        
     }
 }
 
@@ -143,7 +147,7 @@ const updateMovie = async (request: Request, response: Response): Promise<Respon
     } catch (error) {
         if (error instanceof Error){
             return response.status(409).json({
-                message: error.message
+                message: 'Movie already exists.'
             })
         }
         return response.status(500).json({
@@ -151,7 +155,5 @@ const updateMovie = async (request: Request, response: Response): Promise<Respon
         })
     }
 }
-
-
 
 export { createMovie, listMovies, retrieveMovie, deleteMovie, updateMovie }
