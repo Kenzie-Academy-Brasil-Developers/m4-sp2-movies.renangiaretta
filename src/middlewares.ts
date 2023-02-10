@@ -17,15 +17,12 @@ const ensureMovieExists = async (request: Request, response: Response, next: Nex
         text  : queryString,
         values: [id]
     }
-    console.log('entrou no middleware')
     const queryResult: MoviesResult = await client.query(queryConfig)
     if(!queryResult.rowCount){
-        console.log('não passou pelo middleware')
         return response.status(404).json({
             message: 'Movie not found!'
         })
     }else {
-        console.log('passou pelo middleware')
         return next()
 
     }

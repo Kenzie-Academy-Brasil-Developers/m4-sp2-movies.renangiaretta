@@ -79,7 +79,6 @@ const retrieveMovie = async ( request: Request, response: Response ): Promise<Re
     }
     try {
         const queryResult: MoviesResult = await client.query(queryConfig)
-        console.log(queryConfig)
         return response.status(200).json(queryResult.rows[0])
         
     } catch (error) {
@@ -105,7 +104,6 @@ const deleteMovie = async (request: Request, response: Response): Promise<Respon
     }
     try {
         const queryResult: MoviesResult = await client.query(queryConfig)
-        console.log(queryConfig)
         return response.status(204).json()
         
     } catch (error) {
